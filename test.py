@@ -9,6 +9,7 @@ from struct import pack
 from sklearn.neural_network import MLPClassifier
 
 from utils import extract_feature
+from utils import AVAILABLE_EMOTIONS
 
 THRESHOLD = 500
 CHUNK_SIZE = 1024
@@ -137,5 +138,11 @@ if __name__ == "__main__":
     # predict
     result = model.predict(features)[0]
     # show the result !
-    print("result:", result)
+    index = -1;
+    maxVal = -1;
+    for i in range(len(result)):
+        if result[i] > maxVal:
+            maxVal = result[i]
+            index = i
+    print("result:", AVAILABLE_EMOTIONS[index])
     

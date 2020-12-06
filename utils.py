@@ -21,12 +21,14 @@ int2emotion = {
 }
 
 # we allow only these emotions
-AVAILABLE_EMOTIONS = {
+AVAILABLE_EMOTIONS = [
     "angry",
-    "sad",
+    "happy",
     "neutral",
-    "happy"
-}
+    "sad"
+]
+    
+
 
 def extract_feature(file_name, **kwargs):
     """
@@ -45,32 +47,34 @@ def extract_feature(file_name, **kwargs):
     mel = kwargs.get("mel")
     contrast = kwargs.get("contrast")
     tonnetz = kwargs.get("tonnetz")
-    with soundfile.SoundFile(file_name) as sound_file:
+    '''with soundfile.SoundFile(file_name) as sound_file:
         X = sound_file.read(dtype="float32")
-        sample_rate = sound_file.samplerate
-        if chroma or contrast:
-            stft = np.abs(librosa.stft(X))
-        result = np.array([])
-        if mfcc:
-            mfccs = np.mean(librosa.feature.mfcc(y=X, sr=sample_rate, n_mfcc=40).T, axis=0)
-            result = np.hstack((result, mfccs))
-            #print(result.shape)
-        if chroma:
-            chroma = np.mean(librosa.feature.chroma_stft(S=stft, sr=sample_rate).T,axis=0)
-            result = np.hstack((result, chroma))
-            #print(result.shape)
-        if mel:
-            mel = np.mean(librosa.feature.melspectrogram(X, sr=sample_rate).T,axis=0)
-            result = np.hstack((result, mel))
-            #print(result.shape)
-        if contrast:
-            contrast = np.mean(librosa.feature.spectral_contrast(S=stft, sr=sample_rate).T,axis=0)
-            result = np.hstack((result, contrast))
-            #print(result.shape)
-        if tonnetz:
-            tonnetz = np.mean(librosa.feature.tonnetz(y=librosa.effects.harmonic(X), sr=sample_rate).T,axis=0)
-            result = np.hstack((result, tonnetz))
-            #print(result.shape)
+        sample_rate = sound_file.samplerate'''
+    X, sample_rate = librosa.load(file_name, sr = 16000)
+    if chroma or contrast:
+        #Use an energy (magnitude) spectrum instead of power spectrogram
+        stft = np.abs(librosa.stft(X))
+    result = np.array([])
+    if mfcc:
+        mfccs = np.mean(librosa.feature.mfcc(y=X, sr=sample_rate, n_mfcc=40).T, axis=0)
+        result = np.hstack((result, mfccs))
+        #print(result.shape)
+    if chroma:
+        chroma = np.mean(librosa.feature.chroma_stft(S=stft, sr=sample_rate).T,axis=0)
+        result = np.hstack((result, chroma))
+        #print(result.shape)
+    if mel:
+        mel = np.mean(librosa.feature.melspectrogram(X, sr=sample_rate).T,axis=0)
+        result = np.hstack((result, mel))
+        #print(result.shape)
+    if contrast:
+        contrast = np.mean(librosa.feature.spectral_contrast(S=stft, sr=sample_rate).T,axis=0)
+        result = np.hstack((result, contrast))
+        #print(result.shape)
+    if tonnetz:
+        tonnetz = np.mean(librosa.feature.tonnetz(y=librosa.effects.harmonic(X), sr=sample_rate).T,axis=0)
+        result = np.hstack((result, tonnetz))
+        #print(result.shape)
     return result
 
 
@@ -89,10 +93,12 @@ def load_data(test_size=0.2):
         # add to data
         X.append(features)
         y.append(emotion)
-    # split the data to training and testing and return it
-    #
+   
+    # what are the values for each class
     y= pd.DataFrame(y)
     y = pd.get_dummies(y)
-    print(y)
+    #print(y)
     y = y.iloc[:].values
+    print("X.shape ", np.array(X).shape)
+     # split the data to training and testing and return it
     return train_test_split(np.array(X),y, test_size=test_size, random_state=7)
