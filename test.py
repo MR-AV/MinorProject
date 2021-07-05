@@ -1,12 +1,11 @@
 import pyaudio
-import os
 import wave
 import pickle
 import numpy as np
 from sys import byteorder
 from array import array
 from struct import pack
-from sklearn.neural_network import MLPClassifier
+
 
 from utils import extract_feature
 from utils import AVAILABLE_EMOTIONS
@@ -126,7 +125,7 @@ def record_to_file(path):
 
 if __name__ == "__main__":
     # load the saved model (after training)
-    model = pickle.load(open("result/mlp_classifier.model", "rb"))
+    model = pickle.load(open("result/cnn-lstm.model", "rb"))
     print("Please talk")
     filename = "test.wav"
     # record the file (start talking)
@@ -136,7 +135,7 @@ if __name__ == "__main__":
     #expading
     features = np.expand_dims(features, axis=2)
     # predict
-    result = model.predict(features)[0]
+    result =model.predict(features)[0]
     # show the result !
     index = -1;
     maxVal = -1;

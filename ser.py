@@ -23,7 +23,6 @@ from keras.optimizers import SGD
 X_train, X_test, y_train, y_test = load_data(test_size=0.25)
 
 
-# print some details
 # number of samples in training data
 print("[+] Number of training samples:", X_train.shape[0])
 # number of samples in testing data
@@ -79,7 +78,8 @@ model.add(Activation('softmax'))
 opt = 'adam'
 model.compile(optimizer=opt,loss='categorical_crossentropy',metrics=['categorical_accuracy'])
 
-history = model.fit(X_train, y_train, batch_size=16, epochs=1, validation_data=(X_test, y_test))
+epoch = 50
+history = model.fit(X_train, y_train, batch_size=16, epochs=epoch, validation_data=(X_test, y_test))
 y_pred = model.predict_classes(X_test)
 
 
@@ -90,11 +90,11 @@ cm = confusion_matrix(rounded_labels, y_pred)
 
 
 #plotting loss
-"""import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 print("history keys = ", history.history.keys())
 loss_train = history.history['loss']
 loss_val = history.history['val_loss']
-epochs = range(1,51)
+epochs = range(1,epoch+1)
 plt.plot(epochs, loss_train, 'g', label='Training loss')
 plt.plot(epochs, loss_val, 'b', label='validation loss')
 plt.title('Training and Validation loss')
@@ -106,14 +106,14 @@ plt.show()
 #plotting accuracy
 loss_train = history.history['categorical_accuracy']
 loss_val = history.history['val_categorical_accuracy']
-epochs = range(1,51)
+epochs = range(1,epoch+1)
 plt.plot(epochs, loss_train, 'g', label='Training accuracy')
 plt.plot(epochs, loss_val, 'b', label='validation accuracy')
 plt.title('Training and Validation accuracy')
 plt.xlabel('Epochs')
 plt.ylabel('Accuracy')
 plt.legend()
-plt.show()"""
+plt.show()
 
 
 # now we save the model
@@ -121,5 +121,5 @@ plt.show()"""
 if not os.path.isdir("result"):
     os.mkdir("result")
 
-pickle.dump(model, open("result/mlp_classifier.model", "wb"))
+pickle.dump(model, open("result/cnn-lstm.model", "wb"))
 
