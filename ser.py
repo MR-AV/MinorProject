@@ -56,30 +56,43 @@ model.add(Dropout(0.25))
 model.add(MaxPooling1D())
 model.add(Conv1D(128, 3, padding='same'))
 model.add(Activation('relu'))
-model.add(Conv1D(128, 3, padding='same'))
-model.add(Activation('relu'))
-model.add(Conv1D(128, 3, padding='same'))
-model.add(Activation('relu'))
+# model.add(Conv1D(128, 3, padding='same'))
+# model.add(Activation('relu'))
+# model.add(Conv1D(128, 3, padding='same'))
+# model.add(Activation('relu'))
 model.add(Conv1D(128, 3, padding='same'))
 model.add(BatchNormalization())
 model.add(Activation('relu'))
 model.add(Dropout(0.25))
 model.add(MaxPooling1D())
-model.add(Conv1D(256, 3, padding='same'))
-model.add(Activation('relu'))
-model.add(Conv1D(256, 3, padding='same'))
-model.add(Activation('relu'))
-model.add(LSTM(units=128, return_sequences = True)) 
+# model.add(Conv1D(256, 3, padding='same'))
+# model.add(Activation('relu'))
+# model.add(Conv1D(256, 3, padding='same'))
+# model.add(Activation('relu'))
+model.add(LSTM(units=64, return_sequences = True)) 
 model.add(Flatten())
 
-model.add(Dense(4))
+model.add(Dense(3))
 model.add(Activation('softmax'))
 
 opt = 'adam'
-model.compile(optimizer=opt,loss='categorical_crossentropy',metrics=['categorical_accuracy'])
+model.compile(optimizer=opt,loss='categorical_crossentropy',metrics=['accuracy'])
 
 epoch = 50
-history = model.fit(X_train, y_train, batch_size=16, epochs=epoch, validation_data=(X_test, y_test))
+
+# new code
+
+checkpoint_filepath = 'best-model.h5'
+model_checkpoint_callback = keras.callbacks.ModelCheckpoint(
+    filepath=checkpoint_filepath,
+    save_weights_only=True,
+    monitor='val_accuracy',
+    mode='max',
+    save_best_only=True)
+
+history = model.fit(X_train, y_train, batch_size=16, epochs=epoch, validation_data=(X_test, y_test),
+                    callbacks=[model_checkpoint_callback])
+model.load_weights('best-model.h5')
 y_pred = model.predict_classes(X_test)
 
 
@@ -104,10 +117,12 @@ plt.legend()
 plt.show()
 
 #plotting accuracy
-loss_train = history.history['categorical_accuracy']
-loss_val = history.history['val_categorical_accuracy']
+loss_train = history.history['accuracy']
+loss_val = history.history['val_accuracy']
 epochs = range(1,epoch+1)
 plt.plot(epochs, loss_train, 'g', label='Training accuracy')
+plt.plot(1,1)
+plt.plot(0,0)
 plt.plot(epochs, loss_val, 'b', label='validation accuracy')
 plt.title('Training and Validation accuracy')
 plt.xlabel('Epochs')
